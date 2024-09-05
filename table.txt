@@ -1,0 +1,60 @@
+SQL로 작성한 TABLE 확인
+
+CREATE TABLE Users
+(
+    userId    INTEGER             NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    email     VARCHAR(191) UNIQUE NOT NULL,
+    password  VARCHAR(191)        NOT NULL,
+    createdAt DATETIME(3)         NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updatedAt DATETIME(3)         NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+);
+
+
+CREATE TABLE UserInfos
+(
+    userInfoId   INTEGER        NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    userId       INTEGER UNIQUE NOT NULL, -- 1:1 관계 이므로 UNIQUE 조건을 삽입합니다.
+    name         VARCHAR(191)   NOT NULL,
+    age          INTEGER        NULL,
+    gender       VARCHAR(191)   NOT NULL,
+    profileImage VARCHAR(191)   NULL,
+    createdAt    DATETIME(3)    NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updatedAt    DATETIME(3)    NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+);
+
+ALTER TABLE UserInfos
+    ADD CONSTRAINT FK_UserInfos_Users
+        FOREIGN KEY (userId) REFERENCES Users (userId) ON DELETE CASCADE;
+
+CREATE TABLE Posts
+(
+    postId    INTEGER      NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    userId    INTEGER      NOT NULL,
+    title     VARCHAR(191) NOT NULL,
+    content   VARCHAR(191) NOT NULL,
+    createdAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updatedAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+);
+
+ALTER TABLE Posts
+    ADD CONSTRAINT FK_Posts_Users
+        FOREIGN KEY (userId) REFERENCES Users (userId) ON DELETE CASCADE;
+
+
+CREATE TABLE Comments
+(
+    commentId INTEGER      NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    userId    INTEGER      NOT NULL,
+    postId    INTEGER      NOT NULL,
+    content   VARCHAR(191) NOT NULL,
+    createdAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updatedAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+);
+
+ALTER TABLE Comments
+    ADD CONSTRAINT FK_Comments_Posts
+        FOREIGN KEY (postId) REFERENCES Posts (postId) ON DELETE CASCADE;
+
+ALTER TABLE Comments
+    ADD CONSTRAINT FK_Comments_Users
+        FOREIGN KEY (userId) REFERENCES Users (userId) ON DELETE CASCADE;
