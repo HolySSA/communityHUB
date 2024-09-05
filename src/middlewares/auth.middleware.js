@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { prisma } from '../utils/prisma/index.js';
+import { prisma } from '../utils/prisma/index.js'
 
 /** 사용자 인증 미들웨어 **/
 export default async function (req, res, next) {
