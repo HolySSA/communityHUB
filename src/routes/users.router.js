@@ -8,40 +8,47 @@ const router = express.Router();
 
 /** Users-UserInfos 회원가입 API **/
 router.post('/sign-up', async (req, res, next) => {
-  // body 로부터 email, password, name, age, gender, profileImage 전달 받기
-  const { email, password, name, age, gender, profileImage } = req.body;
+  try {
+    // throw new Error('에러 핸들링 미들웨어 테스트');
 
-  const isExistUser = await prisma.users.findFirst({
-    where: { email },
-  });
+    // body 로부터 email, password, name, age, gender, profileImage 전달 받기
+    const { email, password, name, age, gender, profileImage } = req.body;
 
-  // 동일한 email을 가진 사용자 유무 체크
-  if (isExistUser) {
-    return res.status(409).json({ message: '이미 존재하는 이메일입니다.' });
+    const isExistUser = await prisma.users.findFirst({
+      where: { email },
+    });
+
+    // 동일한 email을 가진 사용자 유무 체크
+    if (isExistUser) {
+      return res.status(409).json({ message: '이미 존재하는 이메일입니다.' });
+    }
+
+    // Users 테이블 email, password를 이용해 사용자 생성
+    const saltRounds = 10; // salt를 얼마나 복잡하게 만들지 결정.
+    const hashedPassword = await bcrypt.hash(password, saltRounds); // bcrypt를 이용해서 암호화 하기
+    const user = await prisma.users.create({
+      data: {
+        email: email, // 생략 가능 (email,)
+        password: hashedPassword,
+      },
+    });
+
+    // UserInfos 테이블 name, age, gender, profileImage를 이용해 사용자 정보 생성
+    const userInfo = await prisma.userInfos.create({
+      data: {
+        userId: user.userId,
+        name,
+        age,
+        gender,
+        profileImage,
+      },
+    });
+
+    return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
+  } catch (err) {
+    // 에러 처리 미들웨어로 전달
+    next(err);
   }
-
-  // Users 테이블 email, password를 이용해 사용자 생성
-  const saltRounds = 10; // salt를 얼마나 복잡하게 만들지 결정.
-  const hashedPassword = await bcrypt.hash(password, saltRounds); // bcrypt를 이용해서 암호화 하기
-  const user = await prisma.users.create({
-    data: {
-      email: email, // 생략 가능 (email,)
-      password: hashedPassword,
-    },
-  });
-
-  // UserInfos 테이블 name, age, gender, profileImage를 이용해 사용자 정보 생성
-  const userInfo = await prisma.userInfos.create({
-    data: {
-      userId: user.userId,
-      name,
-      age,
-      gender,
-      profileImage,
-    },
-  });
-
-  return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
 });
 
 /** Users 로그인 API **/
