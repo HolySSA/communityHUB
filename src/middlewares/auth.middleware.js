@@ -4,6 +4,7 @@ import { prisma } from '../utils/prisma/index.js'
 /** 사용자 인증 미들웨어 **/
 export default async function (req, res, next) {
   try {
+    /* 쿠키를 조회하고 Bearer Token과 JWT를 검증 후 userId 할당하는 대신 express-session을 이용하기
     // 클라이언트의 쿠키에서 authorization 전달 받기
     const { authorization } = req.cookies;
 
@@ -21,6 +22,14 @@ export default async function (req, res, next) {
     const decodedToken = jwt.verify(token, 'custom-secret-key');
 
     const userId = decodedToken.userId;
+    */
+
+    // session에 저장되어 있는 userId 가져오기
+    const { userId } = req.session;
+    // userId가 존재하지 않으면 Error
+    if (!userId)
+      throw new Error('로그인이 필요합니다.');
+
     const user = await prisma.users.findFirst({
       where: {
         userId: +userId, // userId를 Number 형식으로 변경
@@ -33,10 +42,12 @@ export default async function (req, res, next) {
 
     next();
   } catch (error) {
+    /* JWT와 연관된 Error이므로 주석
     if (error.name === 'TokenExpiredError')
       return res.status(401).json({ message: '토큰이 만료되었습니다.' });
     if (error.name === 'JsonWebTokenError')
       return res.status(401).json({ message: '토큰이 조작되었습니다.' });
+    */
 
     return res.status(400).json({ message: error.message });
   }

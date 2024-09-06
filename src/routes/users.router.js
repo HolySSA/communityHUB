@@ -79,6 +79,7 @@ router.post('/sign-in', async (req, res, next) => {
   if (!(await bcrypt.compare(password, user.password)))
     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
 
+  /* JWT(토큰) 할당하고 쿠키로 사용자에게 전달하는 대신 express-session 사용
   // 로그인 성공 시 userId를 기반으로 유저 토큰(jwt) 생성
   const token = jwt.sign(
     {
@@ -89,6 +90,10 @@ router.post('/sign-in', async (req, res, next) => {
 
   // 유저에게 'authorization'(인가) 라는 쿠키값 제공
   res.cookie('authorization', `Bearer ${token}`);
+  */
+
+  // express-session을 이용하여 세션 정보에 userId 할당
+  req.session.userId = user.userId;
 
   return res.status(200).json({ message: '로그인에 성공하였습니다.' });
 });
