@@ -1,5 +1,3 @@
-SQL로 작성한 TABLE 확인
-
 CREATE TABLE Users
 (
     userId    INTEGER             NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -7,7 +5,8 @@ CREATE TABLE Users
     password  VARCHAR(191)        NOT NULL,
     createdAt DATETIME(3)         NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     updatedAt DATETIME(3)         NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-);
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 
 
 CREATE TABLE UserInfos
@@ -20,10 +19,28 @@ CREATE TABLE UserInfos
     profileImage VARCHAR(191)   NULL,
     createdAt    DATETIME(3)    NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     updatedAt    DATETIME(3)    NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-);
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE UserInfos
     ADD CONSTRAINT FK_UserInfos_Users
+        FOREIGN KEY (userId) REFERENCES Users (userId) ON DELETE CASCADE;
+
+CREATE TABLE UserHistories
+(
+    userHistoryId VARCHAR(191) NOT NULL DEFAULT (UUID()) PRIMARY KEY,
+    userId        INTEGER      NOT NULL,
+    changedField  VARCHAR(191) NOT NULL,
+    oldValue      VARCHAR(191) NULL,
+    newValue      VARCHAR(191) NOT NULL,
+    changedAt     DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`userHistoryId`)
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE UserHistories
+    ADD CONSTRAINT FK_UserHistories_Users
         FOREIGN KEY (userId) REFERENCES Users (userId) ON DELETE CASCADE;
 
 CREATE TABLE Posts
@@ -34,7 +51,8 @@ CREATE TABLE Posts
     content   VARCHAR(191) NOT NULL,
     createdAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     updatedAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-);
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE Posts
     ADD CONSTRAINT FK_Posts_Users
@@ -49,7 +67,8 @@ CREATE TABLE Comments
     content   VARCHAR(191) NOT NULL,
     createdAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     updatedAt DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-);
+) DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE Comments
     ADD CONSTRAINT FK_Comments_Posts

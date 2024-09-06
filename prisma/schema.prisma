@@ -27,6 +27,8 @@ model Users {
   posts Posts[]
   // Users 테이블과 Comments 테이블이 1:N 관계
   comments Comments[]
+  // Users 테이블과 UserHistories 테이블이 1:N 관계
+  userHistories UserHistories[]
 
   @@map("Users")
 }
@@ -46,6 +48,21 @@ model UserInfos {
   users Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("UserInfos")
+}
+
+model UserHistories {
+  userHistoryId String   @id @default(uuid()) @map("userHistoryId") // uuid() : 범용고유식별자 - 시간, ID 등 4개의 정보를 담은 식별자
+  userId        Int      @map("userId") // 사용자(Users) 테이블을 참조하는 외래키
+  changedField  String   @map("changedField") // 변경된 필드명
+  oldValue      String?  @map("oldValue") // 변경 전 값
+  newValue      String   @map("newValue") // 변경 후 값
+
+  changedAt     DateTime @default(now()) @map("changedAt")
+
+  // Users 테이블과 관계를 설정
+  users Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("UserHistories")
 }
 
 model Posts {
